@@ -22,6 +22,7 @@ Use Docker containers inplace of the DigitalOcean droplet
 - Create the image
   - name: local-droplet
 - Create the container
+  - name: my-ansible-node
   - set container port 22 to local port 2222
 
 ## Task 1 - Manual Ansible deployment
@@ -42,3 +43,26 @@ Write a GitHub Action workflow to:
   - option 2: Use SSH to connect and deploy the application
     - use rsync
     - use GitHub Actions: web-factory/ssh-agent, appleboy/ssh-action
+
+## Clone this repo
+Clone the repo from here using this command:
+```bash
+git clone https://github.com/jjk66/node-service-deployment.git
+cd node-service-deployment
+```
+
+## Create fake droplet application server
+### Build local-droplet image
+```bash
+docker build -t local-droplet .
+```
+### Build the local-droplet container
+Port forward port 22 from container to local port 2222
+```bash
+docker run -d -p 2222:22 --name my-ansible-node local-droplet
+```
+### Ping test to local-droplet
+Use ansible to test the local-droplet container
+```bash
+ansible webservers -i ./inventories -m ping
+```

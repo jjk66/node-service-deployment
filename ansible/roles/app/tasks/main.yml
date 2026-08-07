@@ -1,0 +1,32 @@
+# connect to the server
+# clone clone the repository
+# install dependencies
+# build the application
+# start the application Create a playbook to use the role to get the appliction up and running on port 80
+# use this command: ansible-playbook node_service.yml --tags app
+#you should access the application using the public IP of the server
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install Node.js and npm
+  apt:
+    name:
+    - nodejs
+    - npm
+    state: present
+
+- name: Clone the Node.js service repository
+  git:
+    repo: 'https://github.com/jjk66/node-service-deployment.git'
+    dest: /var/www/hello-world
+
+- name: Install application dependencies
+  npm:
+    path: /var/www/hello-world
+
+- name: Start the Node.js application
+  shell: 'PORT=80 nohup node /var/www/hello-world/app.js > /dev/null 2>&1 &'
+  async: 10
+  poll: 0

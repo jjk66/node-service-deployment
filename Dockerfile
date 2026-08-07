@@ -1,16 +1,14 @@
 FROM ubuntu:22.04
 
-# Install SSH server, Python (required for Ansible), and curl/sudo utilities
 RUN apt-get update && apt-get install -y openssh-server python3 sudo curl && \
     mkdir /var/run/sshd
 
-# Set root password to 'rootpassword' for Ansible authentication
-RUN echo 'root:rootpassword' | chpasswd
+# Create the root SSH directory
+RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh
 
-# Permit root login over SSH configuration
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+# Copy your local Mac public key into the container's authorized_keys
+COPY id_rsa.pub /root/.ssh/authorized_keys
+RUN chmod 600 /root/.ssh/authorized_keys
 
-# SSH network port
 EXPOSE 22
-
 CMD ["/usr/sbin/sshd", "-D"]
