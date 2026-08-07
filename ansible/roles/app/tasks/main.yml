@@ -24,7 +24,7 @@
 
 - name: Install application dependencies
   npm:
-    path: /var/www/hello-world
+    path: /var/www/hello-world/app
 
 - name: Start the Node.js application
   shell: 'PORT=80 nohup node /var/www/hello-world/app.js > /dev/null 2>&1 &'
