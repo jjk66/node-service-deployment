@@ -13,7 +13,7 @@
 
 - name: Clone the Node.js service repository
   git:
-    repo: 'https://github.com'
+    repo: 'https://github.com/jjk66/node-service-deployment.git'
     dest: /var/www/hello-world
 
 - name: Install application dependencies
