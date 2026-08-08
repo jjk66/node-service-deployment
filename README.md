@@ -32,7 +32,7 @@ Setup an ansible role to called ```app``` to:
 - install dependencies
 - build the application
 - start the application
-Create a playbook to use the role to get the appliction up and running on port 80
+Create a playbook to use the role to get the appliction up and running on port 8080
 - use this command: ```ansible-playbook node_service.yml --tags app```
 - you should access the application using the public IP of the server
 
@@ -44,7 +44,9 @@ Write a GitHub Action workflow to:
     - use rsync
     - use GitHub Actions: web-factory/ssh-agent, appleboy/ssh-action
 
-## Clone this repo
+## Instructions
+
+### Pre-requisite Clone this repo
 Clone the repo from here using this command:
 ```bash
 git clone https://github.com/jjk66/node-service-deployment.git
@@ -57,12 +59,23 @@ cd node-service-deployment
 docker build -t local-droplet .
 ```
 ### Build the local-droplet container
-Port forward port 22 from container to local port 2222
+Port forward port 22 from container to local port 2222 and use port 8080 from container to local port 8080
 ```bash
-docker run -d -p 2222:22 --name my-ansible-node local-droplet
+docker run -d --name my-ansible-node -p 2222:22 -p 8080:8080 local-droplet
 ```
 ### Ping test to local-droplet
 Use ansible to test the local-droplet container
 ```bash
 ansible webservers -i ./inventories -m ping
+```
+
+## Use ansible playbook to install to the local droplet container
+### Run the node service playbook to install the application and start the application
+```
+ansible-playbook -i inventories/hosts.yml node_service.yml --tags app
+```
+### Verify application is running
+```
+curl localhost:8080
+--> Hello World from your local Docker droplet!
 ```
