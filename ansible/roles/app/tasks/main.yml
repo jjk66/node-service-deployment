@@ -23,4 +23,4 @@
     path: /var/www/hello-world
 
 - name: Start the Node.js application inside a detached tmux session on port 8080
-  shell: "tmux new-session -d -s node_app 'PORT=8080 node /var/www/hello-world/app.js'"
+  shell: "tmux new-session -d -s node_app 'PORT=8080 node /var/www/hello-world/index.js'"
