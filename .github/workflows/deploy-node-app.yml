@@ -41,8 +41,16 @@ jobs:
           sudo apt-get install -y ansible
           ansible-galaxy collection install community.docker
 
-      - name: List files for debugging
-        run: find . -name "node_service.yml"
+      - name: Setup SSH Private Key
+        run: |
+          mkdir -p ~/.ssh
+          # Write to id_github_runner for your manual/local overrides
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_github_runner
+          chmod 600 ~/.ssh/id_github_runner
+
+          # ALSO write to id_rsa so it satisfies the path hardcoded in your hosts.yml!
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
 
       - name: Run Ansible playbook to deploy Node.js application
         working-directory: ./ansible
