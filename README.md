@@ -88,3 +88,5 @@ This workflow will build local droplet image and container and then run the ansi
 It will verify the container is ready and after the playbook runs a verification will curl the local host on port 8080 to make sure the application is running.
 
 The final action is to destroy the container.
+
+The GitHub Action allows for running a container. For this project I had to store my private key as a secret in GitHub under ```Actions -> Secrets and variables -> click New repository secret button```
