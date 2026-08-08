@@ -41,6 +41,9 @@ jobs:
           sudo apt-get install -y ansible
           ansible-galaxy collection install community.docker
 
+      - name: List files for debugging
+        run: find . -name "node_service.yml"
+
       - name: Run Ansible playbook to deploy Node.js application
         working-directory: ./ansible
         run: ansible-playbook -i inventories/hosts.yml node_service.yml --tags app --private-key ~/.ssh/id_github_runner
