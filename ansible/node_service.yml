@@ -2,4 +2,8 @@
 - hosts: webservers
   roles:
     - role: app
-      tags: app
+  tags: app
+  vars:
+    # Forces Ansible to interact cleanly with containerized systemd
+    ansible_environment:
+      XDG_RUNTIME_DIR: /run/user/0
