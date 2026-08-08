@@ -59,12 +59,18 @@ jobs:
       - name: Verify deployment
         run: |
           echo "Verifying deployment..."
-          sleep 3
+          sleep 10
           if curl -s --fail http://localhost:8080 | grep -q "Hello, World!"; then
             echo "Deployment successful!"
           else
-            echo "Deployment failed! Here is the container logs for debugging:"
-            docker logs my-ansible-node
+            echo "Deployment verification failed!"
+            echo "============"
+            echo "Docker container processes:"
+            docker exec my-ansible-node ps aux
+            echo "============"
+            echo "tmux session capture (node output):"
+            docker exec my-ansible-node tmux capture-pane -pt node_app || echo "No tmux session found."
+            echo "============"
             exit 1
           fi
 
