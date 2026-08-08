@@ -60,7 +60,7 @@ jobs:
         run: |
           echo "Verifying deployment..."
           sleep 10
-          if curl -s --fail http://localhost:8080 | grep -q "Hello, World!"; then
+          if curl -s --fail http://localhost:8080 | grep -q "Hello World from your local Docker drople"; then
             echo "Deployment successful!"
           else
             echo "Deployment verification failed!"
