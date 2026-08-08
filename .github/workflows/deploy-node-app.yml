@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build Docker image for local-droplet
         run: docker build -t local-droplet:latest .
@@ -20,29 +20,45 @@ jobs:
         run: |
           echo "Waiting for the container to be ready..."
           for i in {1..30}; do
-            if docker exec my-ansible-node bash -c "echo 'Container is ready'"; then
-              echo "Container is ready!"
+            if docker exec my-ansible-node pgrep sshd > /dev/null; then
+              echo "SSH is running inside the container. Container is ready!"
               break
             fi
             echo "Waiting for 2 seconds..."
             sleep 2
           done
 
+      - name: Setup SSH Private Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_github_runner
+          chmod 600 ~/.ssh/id_github_runner
+
+      - name: Install Ansible Dependencies
+        run: |
+          echo "Installing Ansible dependencies..."
+          sudo apt-get update
+          sudo apt-get install -y ansible
+          ansible-galaxy collection install community.docker
+
       - name: Run Ansible playbook to deploy Node.js application
-        run: ansible-playbook -i inventories/hosts.yml node_service.yml --tags app
+        run: ansible-playbook -i inventories/hosts.yml node_service.yml --tags app --private-key ~/.ssh/id_github_runner
 
       - name: Verify deployment
         run: |
           echo "Verifying deployment..."
-          if curl -s http://localhost:8080 | grep -q "Hello, World!"; then
+          sleep 3
+          if curl -s --fail http://localhost:8080 | grep -q "Hello, World!"; then
             echo "Deployment successful!"
           else
-            echo "Deployment failed!"
+            echo "Deployment failed! Here is the container logs for debugging:"
+            docker logs my-ansible-node
             exit 1
           fi
 
       - name: Stop and remove local-droplet container
+        if: always()
         run: |
           echo "Stopping and removing the local-droplet container..."
-          docker stop my-ansible-node
-          docker rm my-ansible-node
+          docker stop my-ansible-node || true
+          docker rm my-ansible-node || true
