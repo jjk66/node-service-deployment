@@ -15,10 +15,12 @@
   git:
     repo: 'https://github.com/jjk66/node-service-deployment.git'
     dest: /var/www/hello-world
+    version: main
+    force: yes
 
 - name: Install application dependencies
   npm:
     path: /var/www/hello-world/app
 
-- name: Start the Node.js application inside a detached tmux session
-  shell: "PORT=80 tmux new-session -d -s node_app 'node /var/www/hello-world/app.js'"
+- name: Start the Node.js application inside a detached tmux session on port 8080
+  shell: "tmux new-session -d -s node_app 'PORT=8080 node /var/www/hello-world/app.js'"
