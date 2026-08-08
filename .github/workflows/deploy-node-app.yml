@@ -1,0 +1,48 @@
+---
+name: Deploy Node.js Application using a test container as the droplet host
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-locally:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker image for local-droplet
+        run: docker build -t local-droplet:latest .
+
+      - name: Run local-droplet container
+        run: docker run -d --name my-ansible-node -p 2222:22 -p 8080:8080 local-droplet:latest
+
+      - name: Wait for the container to be ready
+        run: |
+          echo "Waiting for the container to be ready..."
+          for i in {1..30}; do
+            if docker exec my-ansible-node bash -c "echo 'Container is ready'"; then
+              echo "Container is ready!"
+              break
+            fi
+            echo "Waiting for 2 seconds..."
+            sleep 2
+          done
+
+      - name: Run Ansible playbook to deploy Node.js application
+        run: ansible-playbook -i inventories/hosts.yml node_service.yml --tags app
+
+      - name: Verify deployment
+        run: |
+          echo "Verifying deployment..."
+          if curl -s http://localhost:8080 | grep -q "Hello, World!"; then
+            echo "Deployment successful!"
+          else
+            echo "Deployment failed!"
+            exit 1
+          fi
+
+      - name: Stop and remove local-droplet container
+        run: |
+          echo "Stopping and removing the local-droplet container..."
+          docker stop my-ansible-node
+          docker rm my-ansible-node

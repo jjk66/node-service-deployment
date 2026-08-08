@@ -44,7 +44,7 @@ Write a GitHub Action workflow to:
     - use rsync
     - use GitHub Actions: web-factory/ssh-agent, appleboy/ssh-action
 
-## Instructions
+## Task 1 Instructions
 
 ### Pre-requisite Clone this repo
 Clone the repo from here using this command:
@@ -79,3 +79,12 @@ ansible-playbook -i inventories/hosts.yml node_service.yml --tags app
 curl localhost:8080
 --> Hello World from your local Docker droplet!
 ```
+
+## Task 2 instructions
+
+### Use GitHub Workflow
+This workflow will build local droplet image and container and then run the ansible playbook to install and start the Node application.
+
+It will verify the container is ready and after the playbook runs a verification will curl the local host on port 8080 to make sure the application is running.
+
+The final action is to destroy the container.
